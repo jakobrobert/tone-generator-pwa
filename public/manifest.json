@@ -1,0 +1,9 @@
+{
+  "name": "Tone Generator",
+  "short_name": "Tone Generator",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "background_color": "blue",
+  "theme_color": "aqua",
+  "orientation": "portrait-primary"
+}
