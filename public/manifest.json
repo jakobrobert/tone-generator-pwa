@@ -1,7 +1,7 @@
 {
   "name": "Tone Generator",
   "short_name": "Tone Generator",
-  "start_url": "/",
+  "start_url": "/tone-generator-pwa/",
   "display": "fullscreen",
   "background_color": "blue",
   "theme_color": "aqua",
