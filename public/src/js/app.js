@@ -1,3 +1,7 @@
+let ctx;
+let buffer;
+let source;
+
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
     // Notice: url is relative to root, not relative to this file (../sw.js did not work)
@@ -9,14 +13,14 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-function start() {
-    const ctx = new window.AudioContext();
+function generate() {
+    ctx = new window.AudioContext();
 
     const frequency = 440.0;
     const amplitude = 1.0;
     const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
+    buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
 
     // sine tone
     const data = buffer.getChannelData(0);
@@ -24,9 +28,24 @@ function start() {
         const time = i / ctx.sampleRate;
         data[i] = amplitude * Math.sin(2.0 * Math.PI * frequency * time);
     }
+}
 
-    const source = ctx.createBufferSource();
+function start() {
+    if (!buffer) {
+        generate();
+    }
+    // need to re-create the source for each start
+    // in Web Audio, there is no way to restart a source after it is stopped
+    source = ctx.createBufferSource();
     source.buffer = buffer;
+    source.loop = true;
     source.connect(ctx.destination);
     source.start();
+}
+
+function stop() {
+    if (!source) {
+        return;
+    }
+    source.stop();
 }
