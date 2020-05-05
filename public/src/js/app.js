@@ -2,6 +2,9 @@ let ctx;
 let buffer;
 let source;
 
+let frequency;
+let amplitude;
+
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
     // Notice: url is relative to root, not relative to this file (../sw.js did not work)
@@ -18,14 +21,13 @@ onFrequencyChanged();
 onAmplitudeChanged();
 
 function start() {
-    if (!buffer) {
-        generate();
-    }
-    if (source) {
-        source.stop();
-    }
-    // need to re-create the source for each start
-    // in Web Audio, there is no way to restart a source after it is stopped
+    // stop before re-starting to avoid multiple playbacks at once
+    stop();
+
+    // simply re-generate for each start
+    // could optimize later
+    generateSine();
+
     source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
@@ -40,11 +42,9 @@ function stop() {
     source.stop();
 }
 
-function generate() {
+function generateSine() {
     ctx = new window.AudioContext();
 
-    const frequency = 440.0;
-    const amplitude = 1.0;
     const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
     buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
@@ -59,14 +59,14 @@ function generate() {
 
 function onFrequencyChanged() {
     const slider = document.getElementById("frequencySlider");
-    const frequency = slider.value;
+    frequency = slider.value;
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
 }
 
 function onAmplitudeChanged() {
     const slider = document.getElementById("amplitudeSlider");
-    const amplitude = slider.value / 100.0;
+    amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
 }
