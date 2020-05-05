@@ -21,6 +21,9 @@ function start() {
     if (!buffer) {
         generate();
     }
+    if (source) {
+        source.stop();
+    }
     // need to re-create the source for each start
     // in Web Audio, there is no way to restart a source after it is stopped
     source = ctx.createBufferSource();
