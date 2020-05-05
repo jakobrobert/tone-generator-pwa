@@ -43,7 +43,10 @@ function stop() {
 }
 
 function generateSine() {
-    ctx = new window.AudioContext();
+    // only create audio context once
+    if (!ctx) {
+        ctx = new window.AudioContext();
+    }
 
     const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
