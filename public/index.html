@@ -8,6 +8,23 @@
 </head>
 <body>
     <h2>Tone Generator</h2>
+
+    <button type="button" onclick="start()">Start</button>
+    <button type="button" onclick="stop()">Stop</button>
+
+    <div>
+        <label for="frequencySlider">Frequency</label>
+        <input type="range" id="frequencySlider" min="100" max="1000" value="440" oninput="onFrequencyChanged()">
+        <label id="frequencyLabel"></label>
+    </div>
+    <div>
+        <label for="amplitudeSlider">Amplitude</label>
+        <input type="range" id="amplitudeSlider" min="0" max="100" value="50" oninput="onAmplitudeChanged()">
+        <label id="amplitudeLabel"></label>
+    </div>
+
+    <p>You need to click <i>Start</i> to apply the changed values.</p>
+
     <script src="./src/js/app.js"></script>
 </body>
 </html>
