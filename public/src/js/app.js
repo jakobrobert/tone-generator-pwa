@@ -13,6 +13,10 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// update for initial slider values
+onFrequencyChanged();
+onAmplitudeChanged();
+
 function start() {
     if (!buffer) {
         generate();
@@ -63,5 +67,3 @@ function onAmplitudeChanged() {
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
 }
-
-// TODO: init function for initial slider values
