@@ -13,23 +13,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-function generate() {
-    ctx = new window.AudioContext();
-
-    const frequency = 440.0;
-    const amplitude = 1.0;
-    const duration = 1.0;
-    const numSamples = ctx.sampleRate * duration;
-    buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
-
-    // sine tone
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < buffer.length; i++) {
-        const time = i / ctx.sampleRate;
-        data[i] = amplitude * Math.sin(2.0 * Math.PI * frequency * time);
-    }
-}
-
 function start() {
     if (!buffer) {
         generate();
@@ -49,3 +32,36 @@ function stop() {
     }
     source.stop();
 }
+
+function generate() {
+    ctx = new window.AudioContext();
+
+    const frequency = 440.0;
+    const amplitude = 1.0;
+    const duration = 1.0;
+    const numSamples = ctx.sampleRate * duration;
+    buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
+
+    // sine tone
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < buffer.length; i++) {
+        const time = i / ctx.sampleRate;
+        data[i] = amplitude * Math.sin(2.0 * Math.PI * frequency * time);
+    }
+}
+
+function onFrequencyChanged() {
+    const slider = document.getElementById("frequencySlider");
+    const frequency = slider.value;
+    const label = document.getElementById("frequencyLabel");
+    label.innerText = frequency + " Hz";
+}
+
+function onAmplitudeChanged() {
+    const slider = document.getElementById("amplitudeSlider");
+    const amplitude = slider.value / 100.0;
+    const label = document.getElementById("amplitudeLabel");
+    label.innerText = "" + amplitude;
+}
+
+// TODO: init function for initial slider values
