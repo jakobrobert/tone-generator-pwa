@@ -8,10 +8,10 @@
 </head>
 <body>
     <h2>Tone Generator</h2>
-
-    <button type="button" onclick="start()">Start</button>
-    <button type="button" onclick="stop()">Stop</button>
-
+    <div>
+        <label for="function">Function: </label>
+        <input type="text" id="function" value="sin(2*pi*f*t)" size="35">
+    </div>
     <div>
         <label for="frequencySlider">Frequency</label>
         <input type="range" id="frequencySlider" min="100" max="1000" value="440" oninput="onFrequencyChanged()">
@@ -21,6 +21,11 @@
         <label for="amplitudeSlider">Amplitude</label>
         <input type="range" id="amplitudeSlider" min="0" max="100" value="50" oninput="onAmplitudeChanged()">
         <label id="amplitudeLabel"></label>
+    </div>
+    <br>
+    <div>
+        <button type="button" onclick="start()">Start</button>
+        <button type="button" onclick="stop()">Stop</button>
     </div>
 
     <p>You need to click <i>Start</i> to apply the changed values.</p>

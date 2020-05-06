@@ -22,13 +22,27 @@ if ('serviceWorker' in navigator) {
 onFrequencyChanged();
 onAmplitudeChanged();
 
+function onFrequencyChanged() {
+    const slider = document.getElementById("frequencySlider");
+    frequency = slider.value;
+    const label = document.getElementById("frequencyLabel");
+    label.innerText = frequency + " Hz";
+}
+
+function onAmplitudeChanged() {
+    const slider = document.getElementById("amplitudeSlider");
+    amplitude = slider.value / 100.0;
+    const label = document.getElementById("amplitudeLabel");
+    label.innerText = "" + amplitude;
+}
+
 function start() {
     // stop before re-starting to avoid multiple playbacks at once
     stop();
 
     // simply re-generate for each start
     // could optimize later
-    generateSine();
+    generateTone();
 
     source = ctx.createBufferSource();
     source.buffer = buffer;
@@ -64,7 +78,7 @@ function stop() {
     }
 }
 
-function generateSine() {
+function generateTone() {
     // only create audio context once
     if (!ctx) {
         ctx = new window.AudioContext();
@@ -74,24 +88,15 @@ function generateSine() {
     const numSamples = ctx.sampleRate * duration;
     buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
 
-    // sine tone
+    const func = new Function("f", "t", "return Math.sin(2.0 * Math.PI * f * t);");
+
     const data = buffer.getChannelData(0);
     for (let i = 0; i < buffer.length; i++) {
         const time = i / ctx.sampleRate;
-        data[i] = amplitude * Math.sin(2.0 * Math.PI * frequency * time);
+        data[i] = amplitude * func(frequency, time);
     }
 }
 
-function onFrequencyChanged() {
-    const slider = document.getElementById("frequencySlider");
-    frequency = slider.value;
-    const label = document.getElementById("frequencyLabel");
-    label.innerText = frequency + " Hz";
-}
-
-function onAmplitudeChanged() {
-    const slider = document.getElementById("amplitudeSlider");
-    amplitude = slider.value / 100.0;
-    const label = document.getElementById("amplitudeLabel");
-    label.innerText = "" + amplitude;
+function sine(frequency, time) {
+    return Math.sin(2.0 * Math.PI * frequency * time);
 }
