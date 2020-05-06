@@ -1,6 +1,8 @@
 let ctx;
 let buffer;
 let source;
+let recorder;
+let recordData = [];
 
 let frequency;
 let amplitude;
@@ -31,15 +33,35 @@ function start() {
     source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
-    source.connect(ctx.destination);
+    source.connect(ctx.destination); // connect for playback
+
+    // record
+    const destination = ctx.createMediaStreamDestination();
+    recorder = new MediaRecorder(destination.stream);
+    source.connect(destination); // connect for recording
+    recorder.start();
+
+    recordData = [];
+
+    recorder.ondataavailable = (evt) => {
+        recordData.push(evt.data);
+    };
+
+    recorder.onstop = (evt) => {
+        const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
+        document.getElementById("record").src = URL.createObjectURL(blob);
+    };
+
     source.start();
 }
 
 function stop() {
-    if (!source) {
-        return;
+    if (recorder && recorder.state !== "inactive") {
+        recorder.stop();
     }
-    source.stop();
+    if (source) {
+        source.stop();
+    }
 }
 
 function generateSine() {
