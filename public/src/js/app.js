@@ -56,16 +56,12 @@ function start() {
 }
 
 function stop() {
-    if (recorder) {
+    if (recorder && recorder.state !== "inactive") {
         recorder.stop();
     }
     if (source) {
         source.stop();;
     }
-}
-
-function record() {
-    console.log("Recordd");
 }
 
 function generateSine() {
