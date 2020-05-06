@@ -60,7 +60,7 @@ function stop() {
         recorder.stop();
     }
     if (source) {
-        source.stop();;
+        source.stop();
     }
 }
 
