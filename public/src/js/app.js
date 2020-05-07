@@ -87,14 +87,23 @@ function generateTone() {
     const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
     buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
-
-    const func = new Function("f", "t", "return Math.sin(2.0 * Math.PI * f * t);");
-
     const data = buffer.getChannelData(0);
+
+    const func = createFunction();
+
     for (let i = 0; i < buffer.length; i++) {
         const time = i / ctx.sampleRate;
         data[i] = amplitude * func(frequency, time);
     }
+}
+
+function createFunction() {
+    // TODO: catch syntax errors
+    let expr = document.getElementById("function").value;
+    expr = expr.replace(/sin/gi, "Math.sin")
+    expr = expr.replace(/pi/gi, "Math.PI");
+    expr = "return " + expr + ";";
+    return new Function("f", "t", expr);
 }
 
 function sine(frequency, time) {
