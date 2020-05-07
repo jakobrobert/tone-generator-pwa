@@ -18,6 +18,13 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// webkit prefix for Safari and older browser versions
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+if (!AudioContext) {
+    alert("Sorry, but your browser sucks! You should upgrade it or use Google Chrome or Mozilla Firefox.");
+    throw new Error("Web Audio not supported!");
+}
+
 // update for initial slider values
 onFrequencyChanged();
 onAmplitudeChanged();
@@ -67,7 +74,7 @@ function stop() {
 function generateSine() {
     // only create audio context once
     if (!ctx) {
-        ctx = new window.AudioContext();
+        ctx = new AudioContext();
     }
 
     const duration = 1.0;
