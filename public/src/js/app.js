@@ -105,7 +105,3 @@ function createFunction() {
     expr = "return " + expr + ";";
     return new Function("f", "t", expr);
 }
-
-function sine(frequency, time) {
-    return Math.sin(2.0 * Math.PI * frequency * time);
-}
