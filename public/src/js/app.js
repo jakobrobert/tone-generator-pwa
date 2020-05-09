@@ -1,5 +1,4 @@
 let ctx;
-let buffer;
 let source;
 let recorder;
 let recordData = [];
@@ -49,7 +48,10 @@ function start() {
 
     // simply re-generate for each start
     // could optimize later
-    generateTone();
+    const buffer = generateTone();
+    if (!buffer) {
+        return;
+    }
 
     source = ctx.createBufferSource();
     source.buffer = buffer;
@@ -86,6 +88,12 @@ function stop() {
 }
 
 function generateTone() {
+    const func = createFunction();
+    if (!func) {
+        // invalid function, cannot generate tone
+        return;
+    }
+
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
@@ -93,22 +101,26 @@ function generateTone() {
 
     const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
-    buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
+    const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
     const data = buffer.getChannelData(0);
-
-    const func = createFunction();
 
     for (let i = 0; i < buffer.length; i++) {
         const time = i / ctx.sampleRate;
         data[i] = amplitude * func(frequency, time);
     }
+
+    return buffer;
 }
 
 function createFunction() {
-    // TODO: catch syntax errors
     let expr = document.getElementById("function").value;
     expr = expr.replace(/sin/gi, "Math.sin")
     expr = expr.replace(/pi/gi, "Math.PI");
     expr = "return " + expr + ";";
-    return new Function("f", "t", expr);
+    try {
+        return new Function("f", "t", expr);
+    } catch (err) {
+        console.error(err);
+        alert("Syntax error in function: " + err.message);
+    }
 }
