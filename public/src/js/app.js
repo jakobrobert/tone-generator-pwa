@@ -1,5 +1,4 @@
 let ctx;
-let buffer;
 let source;
 let recorder;
 let recordData = [];
@@ -29,17 +28,34 @@ if (!AudioContext) {
 onFrequencyChanged();
 onAmplitudeChanged();
 
+function onFrequencyChanged() {
+    const slider = document.getElementById("frequencySlider");
+    frequency = slider.value;
+    const label = document.getElementById("frequencyLabel");
+    label.innerText = frequency + " Hz";
+}
+
+function onAmplitudeChanged() {
+    const slider = document.getElementById("amplitudeSlider");
+    amplitude = slider.value / 100.0;
+    const label = document.getElementById("amplitudeLabel");
+    label.innerText = "" + amplitude;
+}
+
 function start() {
     // stop before re-starting to avoid multiple playbacks at once
     stop();
 
     // simply re-generate for each start
     // could optimize later
-    generateSine();
+    const buffer = generateTone();
+    if (!buffer) {
+        return;
+    }
 
     source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.loop = true;
+    source.loop = document.getElementById("loop").checked;
     source.connect(ctx.destination); // connect for playback
 
     // record
@@ -71,34 +87,57 @@ function stop() {
     }
 }
 
-function generateSine() {
+function generateTone() {
+    const func = createFunction();
+    if (!func) {
+        // invalid function, cannot generate tone
+        return;
+    }
+
+    const duration = getDuration();
+    if (!duration) {
+        // invalid duration, cannot generate tone
+        return;
+    }
+
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
     }
 
-    const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
-    buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
-
-    // sine tone
+    const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
     const data = buffer.getChannelData(0);
+
     for (let i = 0; i < buffer.length; i++) {
         const time = i / ctx.sampleRate;
-        data[i] = amplitude * Math.sin(2.0 * Math.PI * frequency * time);
+        data[i] = amplitude * func(frequency, time);
+    }
+
+    return buffer;
+}
+
+function createFunction() {
+    let expr = document.getElementById("function").value;
+    expr = expr.replace(/sin/gi, "Math.sin")
+    expr = expr.replace(/pi/gi, "Math.PI");
+    expr = "return " + expr + ";";
+    try {
+        return new Function("f", "t", expr);
+    } catch (err) {
+        console.error("Error in \"function\": ", err);
+        alert("Error in \"function\": " + err.message);
     }
 }
 
-function onFrequencyChanged() {
-    const slider = document.getElementById("frequencySlider");
-    frequency = slider.value;
-    const label = document.getElementById("frequencyLabel");
-    label.innerText = frequency + " Hz";
-}
-
-function onAmplitudeChanged() {
-    const slider = document.getElementById("amplitudeSlider");
-    amplitude = slider.value / 100.0;
-    const label = document.getElementById("amplitudeLabel");
-    label.innerText = "" + amplitude;
+function getDuration() {
+    let expr = document.getElementById("duration").value;
+    expr = "return " + expr + ";";
+    try {
+        const func = new Function("f", expr);
+        return func(frequency);
+    } catch (err) {
+        console.error("Error in \"duration\": ", err);
+        alert("Error in \"duration\": " + err.message);
+    }
 }
