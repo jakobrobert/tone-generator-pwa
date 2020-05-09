@@ -94,12 +94,17 @@ function generateTone() {
         return;
     }
 
+    const duration = getDuration();
+    if (!duration) {
+        // invalid duration, cannot generate tone
+        return;
+    }
+
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
     }
 
-    const duration = 1.0;
     const numSamples = ctx.sampleRate * duration;
     const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -120,7 +125,19 @@ function createFunction() {
     try {
         return new Function("f", "t", expr);
     } catch (err) {
-        console.error(err);
-        alert("Syntax error in function: " + err.message);
+        console.error("Error in \"function\": ", err);
+        alert("Error in \"function\": " + err.message);
+    }
+}
+
+function getDuration() {
+    let expr = document.getElementById("duration").value;
+    expr = "return " + expr + ";";
+    try {
+        const func = new Function("f", expr);
+        return func(frequency);
+    } catch (err) {
+        console.error("Error in \"duration\": ", err);
+        alert("Error in \"duration\": " + err.message);
     }
 }
