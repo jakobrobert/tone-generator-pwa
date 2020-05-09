@@ -55,7 +55,7 @@ function start() {
 
     source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.loop = true;
+    source.loop = document.getElementById("loop").checked;
     source.connect(ctx.destination); // connect for playback
 
     // record
