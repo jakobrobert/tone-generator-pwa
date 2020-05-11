@@ -73,9 +73,10 @@ function stop() {
 function update() {
     // re-start, but only if it is currently running
     if (ctx && ctx.state === "running") {
+        // re-start the source but not the recorder
         source.stop();
         createSource();
-        source.connect(recorderDestination); // connect new source to existing recorder
+        source.connect(recorderDestination);
         source.start();
     }
 }
