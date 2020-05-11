@@ -1,6 +1,7 @@
 let ctx;
 let source;
 let recorder;
+let recorderDestination;
 let recordData = [];
 
 let frequency;
@@ -33,6 +34,7 @@ function onFrequencyChanged() {
     frequency = slider.value;
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
+    update();
 }
 
 function onAmplitudeChanged() {
@@ -40,29 +42,62 @@ function onAmplitudeChanged() {
     amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
+    update();
 }
 
 function start() {
     // stop before re-starting to avoid multiple playbacks at once
     stop();
 
+    if (!createSource()) {
+        return;
+    }
+
+    createRecorder();
+
+    source.connect(recorderDestination);
+    recorder.start();
+    source.start();
+}
+
+function stop() {
+    // important to check for inactive state, gives error otherwise
+    if (recorder && recorder.state !== "inactive") {
+        recorder.stop();
+    }
+    if (source) {
+        source.stop();
+    }
+}
+
+function update() {
+    // re-start, but only if it is currently running
+    if (ctx && ctx.state === "running") {
+        // re-start the source but not the recorder
+        source.stop();
+        createSource();
+        source.connect(recorderDestination);
+        source.start();
+    }
+}
+
+function createSource() {
     // simply re-generate for each start
     // could optimize later
     const buffer = generateTone();
     if (!buffer) {
-        return;
+        return false;
     }
-
     source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = document.getElementById("loop").checked;
     source.connect(ctx.destination); // connect for playback
+    return true;
+}
 
-    // record
-    const destination = ctx.createMediaStreamDestination();
-    recorder = new MediaRecorder(destination.stream);
-    source.connect(destination); // connect for recording
-    recorder.start();
+function createRecorder() {
+    recorderDestination = ctx.createMediaStreamDestination();
+    recorder = new MediaRecorder(recorderDestination.stream);
 
     recordData = [];
 
@@ -74,17 +109,6 @@ function start() {
         const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
         document.getElementById("record").src = URL.createObjectURL(blob);
     };
-
-    source.start();
-}
-
-function stop() {
-    if (recorder && recorder.state !== "inactive") {
-        recorder.stop();
-    }
-    if (source) {
-        source.stop();
-    }
 }
 
 function generateTone() {
