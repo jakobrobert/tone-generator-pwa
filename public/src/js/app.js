@@ -34,7 +34,7 @@ function onFrequencyChanged() {
     frequency = slider.value;
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
-    //update();
+    update();
 }
 
 function onAmplitudeChanged() {
@@ -42,7 +42,7 @@ function onAmplitudeChanged() {
     amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
-    //update();
+    update();
 }
 
 function start() {
@@ -61,6 +61,7 @@ function start() {
 }
 
 function stop() {
+    // important to check for inactive state, gives error otherwise
     if (recorder && recorder.state !== "inactive") {
         recorder.stop();
     }
@@ -72,7 +73,10 @@ function stop() {
 function update() {
     // re-start, but only if it is currently running
     if (ctx && ctx.state === "running") {
-        // TODO: only re-start source, not recorder
+        source.stop();
+        createSource();
+        source.connect(recorderDestination); // connect new source to existing recorder
+        source.start();
     }
 }
 
