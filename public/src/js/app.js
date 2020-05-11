@@ -33,6 +33,7 @@ function onFrequencyChanged() {
     frequency = slider.value;
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
+    update();
 }
 
 function onAmplitudeChanged() {
@@ -40,6 +41,7 @@ function onAmplitudeChanged() {
     amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
+    update();
 }
 
 function start() {
@@ -84,6 +86,13 @@ function stop() {
     }
     if (source) {
         source.stop();
+    }
+}
+
+function update() {
+    // re-start, but only if it is currently running
+    if (ctx && ctx.state === "running") {
+        start();
     }
 }
 
