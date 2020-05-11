@@ -1,6 +1,7 @@
 let ctx;
 let source;
 let recorder;
+let recorderDestination;
 let recordData = [];
 
 let frequency;
@@ -33,7 +34,7 @@ function onFrequencyChanged() {
     frequency = slider.value;
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
-    update();
+    //update();
 }
 
 function onAmplitudeChanged() {
@@ -41,42 +42,21 @@ function onAmplitudeChanged() {
     amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
-    update();
+    //update();
 }
 
 function start() {
     // stop before re-starting to avoid multiple playbacks at once
     stop();
 
-    // simply re-generate for each start
-    // could optimize later
-    const buffer = generateTone();
-    if (!buffer) {
+    if (!createSource()) {
         return;
     }
 
-    source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = document.getElementById("loop").checked;
-    source.connect(ctx.destination); // connect for playback
+    createRecorder();
 
-    // record
-    const destination = ctx.createMediaStreamDestination();
-    recorder = new MediaRecorder(destination.stream);
-    source.connect(destination); // connect for recording
+    source.connect(recorderDestination);
     recorder.start();
-
-    recordData = [];
-
-    recorder.ondataavailable = (evt) => {
-        recordData.push(evt.data);
-    };
-
-    recorder.onstop = (evt) => {
-        const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
-        document.getElementById("record").src = URL.createObjectURL(blob);
-    };
-
     source.start();
 }
 
@@ -92,8 +72,38 @@ function stop() {
 function update() {
     // re-start, but only if it is currently running
     if (ctx && ctx.state === "running") {
-        start();
+        // TODO: only re-start source, not recorder
     }
+}
+
+function createSource() {
+    // simply re-generate for each start
+    // could optimize later
+    const buffer = generateTone();
+    if (!buffer) {
+        return false;
+    }
+    source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = document.getElementById("loop").checked;
+    source.connect(ctx.destination); // connect for playback
+    return true;
+}
+
+function createRecorder() {
+    recorderDestination = ctx.createMediaStreamDestination();
+    recorder = new MediaRecorder(recorderDestination.stream);
+
+    recordData = [];
+
+    recorder.ondataavailable = (evt) => {
+        recordData.push(evt.data);
+    };
+
+    recorder.onstop = (evt) => {
+        const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
+        document.getElementById("record").src = URL.createObjectURL(blob);
+    };
 }
 
 function generateTone() {
