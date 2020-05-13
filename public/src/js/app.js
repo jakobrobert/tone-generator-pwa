@@ -1,3 +1,5 @@
+const UPDATE_TIMEOUT = 50;
+
 let ctx;
 let source;
 let recorder;
@@ -6,6 +8,9 @@ let recordData = [];
 
 let frequency;
 let amplitude;
+
+// initially true, so first event will trigger an update
+let mustUpdate = true;
 
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
@@ -71,6 +76,18 @@ function stop() {
 }
 
 function update() {
+    if (mustUpdate) {
+        // update is already triggered, so new events will not trigger new updates
+        mustUpdate = false;
+        setTimeout(() => {
+            // timeout over, so handle update, new events will again trigger new updates
+            mustUpdate = true;
+            handleUpdate();
+        }, UPDATE_TIMEOUT);
+    }
+}
+
+function handleUpdate() {
     // re-start, but only if it is currently running
     if (ctx && ctx.state === "running") {
         // re-start the source but not the recorder
