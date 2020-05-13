@@ -88,7 +88,6 @@ function update() {
 }
 
 function handleUpdate() {
-    console.log("update");
     // re-start, but only if it is currently running
     if (ctx && ctx.state === "running") {
         // re-start the source but not the recorder
