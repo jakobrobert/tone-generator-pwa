@@ -1,5 +1,7 @@
 const UPDATE_TIMEOUT = 50;
 
+const BASE_URL = "https://jack0042.uber.space/tone-generator-pwa/"
+
 let ctx;
 let source;
 let recorder;
@@ -29,6 +31,8 @@ if (!AudioContext) {
     alert("Sorry, but your browser sucks! You should upgrade it or use Google Chrome or Mozilla Firefox.");
     throw new Error("Web Audio not supported!");
 }
+
+parseURL();
 
 // update for initial slider values
 onFrequencyChanged();
@@ -124,7 +128,8 @@ function createRecorder() {
 
     recorder.onstop = (evt) => {
         const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
-        document.getElementById("record").src = URL.createObjectURL(blob);
+        const record = document.getElementById("record");
+        record.src = URL.createObjectURL(blob);
     };
 }
 
@@ -182,3 +187,63 @@ function getDuration() {
         alert("Error in \"duration\": " + err.message);
     }
 }
+
+function createLink() {
+    const url = buildURL();
+    const link = document.getElementById("link");
+    link.value = url;
+}
+
+function copyLink() {
+    const link = document.getElementById("link");
+    link.select();
+    document.execCommand("copy");
+    alert("Copied link: " + link.value);
+}
+
+function buildURL() {
+    const params = {
+        func: document.getElementById("function").value,
+        duration: document.getElementById("duration").value,
+        loop: document.getElementById("loop").checked,
+        frequency: document.getElementById("frequencySlider").value,
+        amplitude: document.getElementById("amplitudeSlider").value
+    };
+
+    const queryParams = [];
+    for (const key in params) {
+        const queryParam = encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+        queryParams.push(queryParam);
+    }
+    const queryString = "?" + queryParams.join("&");
+
+    return BASE_URL + queryString;
+}
+
+function parseURL() {
+    const url = new URL(document.location);
+    const params = url.searchParams;
+
+    const func = params.get("func");
+    const duration = params.get("duration");
+    const loop = params.get("loop");
+    const frequencyValue = params.get("frequency");
+    const amplitudeValue = params.get("amplitude");
+
+    if (func) {
+        document.getElementById("function").value = func;
+    }
+    if (duration) {
+        document.getElementById("duration").value = duration;
+    }
+    if (loop) {
+        document.getElementById("loop").checked = (loop === "true");
+    }
+    if (frequencyValue) {
+        document.getElementById("frequencySlider").value = frequencyValue;
+    }
+    if (amplitudeValue) {
+        document.getElementById("amplitudeSlider").value = amplitudeValue;
+    }
+}
+
