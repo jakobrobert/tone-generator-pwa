@@ -186,9 +186,10 @@ function getDuration() {
     }
 }
 
-function copyLink() {
+function createLink() {
     const url = buildURL();
-    console.log(url);
+    const link = document.getElementById("link");
+    link.value = url;
 }
 
 function buildURL() {
@@ -208,4 +209,11 @@ function buildURL() {
     const queryString = "?" + queryParams.join("&");
 
     return BASE_URL + queryString;
+}
+
+function copyLink() {
+    const link = document.getElementById("link");
+    link.select();
+    document.execCommand("copy");
+    alert("Copied link: " + link.value);
 }
