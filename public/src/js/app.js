@@ -1,5 +1,7 @@
 const UPDATE_TIMEOUT = 50;
 
+const BASE_URL = "https://jack0042.uber.space/tone-generator-pwa"
+
 let ctx;
 let source;
 let recorder;
@@ -124,7 +126,8 @@ function createRecorder() {
 
     recorder.onstop = (evt) => {
         const blob = new Blob(recordData, { "type": "audio/ogg; codecs=opus" });
-        document.getElementById("record").src = URL.createObjectURL(blob);
+        const record = document.getElementById("record");
+        record.src = URL.createObjectURL(blob);
     };
 }
 
@@ -181,4 +184,28 @@ function getDuration() {
         console.error("Error in \"duration\": ", err);
         alert("Error in \"duration\": " + err.message);
     }
+}
+
+function copyLink() {
+    const url = buildURL();
+    console.log(url);
+}
+
+function buildURL() {
+    const params = {
+        func: document.getElementById("function").value,
+        duration: document.getElementById("duration").value,
+        loop: document.getElementById("loop").checked,
+        frequency: document.getElementById("frequencySlider").value,
+        amplitude: document.getElementById("amplitudeSlider").value
+    };
+
+    const queryParams = [];
+    for (const key in params) {
+        const queryParam = encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+        queryParams.push(queryParam);
+    }
+    const queryString = "?" + queryParams.join("&");
+
+    return BASE_URL + queryString;
 }
