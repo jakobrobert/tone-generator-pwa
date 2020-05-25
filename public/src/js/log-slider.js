@@ -11,6 +11,6 @@ class LogSlider {
     }
 
     getPositionFromValue(value) {
-        return Math.log(value / this.minVal) / this.scale;
+        return (Math.log(value / this.minVal) / this.scale);
     }
 }
