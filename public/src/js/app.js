@@ -32,6 +32,8 @@ if (!AudioContext) {
     throw new Error("Web Audio not supported!");
 }
 
+const logFrequencySlider = new LogSlider(100, 20, 20000);
+
 parseURL();
 
 // update for initial slider values
@@ -44,6 +46,13 @@ function onFrequencyChanged() {
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
     update();
+}
+
+function onLogFrequencyChanged() {
+    const slider = document.getElementById("logFrequencySlider");
+    const logFrequency = logFrequencySlider.getValueFromPosition(slider.value).toFixed(0);
+    const label = document.getElementById("logFrequencyLabel");
+    label.innerText = logFrequency + " Hz";
 }
 
 function onAmplitudeChanged() {

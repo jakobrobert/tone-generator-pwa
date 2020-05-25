@@ -9,6 +9,7 @@
     <!-- iOS support -->
     <link rel="apple-touch-icon" href="./src/img/icons/icon-192x192.png">
     <meta name="apple-mobile-web-app-status-bar" content="aqua">
+    <script src="./src/js/log-slider.js"></script>
 </head>
 <body>
     <h2>Tone Generator</h2>
@@ -28,6 +29,11 @@
         <label for="frequencySlider">Frequency</label>
         <input type="range" id="frequencySlider" min="100" max="1000" value="440" oninput="onFrequencyChanged()">
         <label id="frequencyLabel"></label>
+    </div>
+    <div>
+        <label for="logFrequencySlider">Frequency (Log Slider)</label>
+        <input type="range" id="logFrequencySlider" min="0" max="100" oninput="onLogFrequencyChanged()">
+        <label id="logFrequencyLabel"></label>
     </div>
     <div>
         <label for="amplitudeSlider">Amplitude</label>
