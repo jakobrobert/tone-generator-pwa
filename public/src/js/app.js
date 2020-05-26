@@ -32,6 +32,8 @@ if (!AudioContext) {
     throw new Error("Web Audio not supported!");
 }
 
+const logFrequencySlider = new LogSlider(100, 20, 20000);
+
 parseURL();
 
 // update for initial slider values
@@ -40,7 +42,7 @@ onAmplitudeChanged();
 
 function onFrequencyChanged() {
     const slider = document.getElementById("frequencySlider");
-    frequency = slider.value;
+    frequency = logFrequencySlider.getValueFromPosition(slider.value).toFixed(0);
     const label = document.getElementById("frequencyLabel");
     label.innerText = frequency + " Hz";
     update();
@@ -206,8 +208,8 @@ function buildURL() {
         func: document.getElementById("function").value,
         duration: document.getElementById("duration").value,
         loop: document.getElementById("loop").checked,
-        frequency: document.getElementById("frequencySlider").value,
-        amplitude: document.getElementById("amplitudeSlider").value
+        frequency: frequency,
+        amplitude: amplitude
     };
 
     const queryParams = [];
@@ -240,10 +242,12 @@ function parseURL() {
         document.getElementById("loop").checked = (loop === "true");
     }
     if (frequencyValue) {
-        document.getElementById("frequencySlider").value = frequencyValue;
+        const position = logFrequencySlider.getPositionFromValue(frequencyValue).toFixed(0);
+        document.getElementById("frequencySlider").value = position;
     }
     if (amplitudeValue) {
-        document.getElementById("amplitudeSlider").value = amplitudeValue;
+        const position = (amplitudeValue * 100).toFixed(0);
+        document.getElementById("amplitudeSlider").value = position;
     }
 }
 
