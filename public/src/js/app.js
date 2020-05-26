@@ -11,6 +11,8 @@ let recordData = [];
 let frequency;
 let amplitude;
 
+let playing = false;
+
 // initially true, so first event will trigger an update
 let mustUpdate = true;
 
@@ -69,6 +71,7 @@ function start() {
     source.connect(recorderDestination);
     recorder.start();
     source.start();
+    playing = true;
 }
 
 function stop() {
@@ -76,8 +79,9 @@ function stop() {
     if (recorder && recorder.state !== "inactive") {
         recorder.stop();
     }
-    if (source) {
+    if (playing) {
         source.stop();
+        playing = false;
     }
 }
 
@@ -94,9 +98,9 @@ function update() {
 }
 
 function handleUpdate() {
-    // re-start, but only if it is currently running
-    if (ctx && ctx.state === "running") {
-        // re-start the source but not the recorder
+    // restart, but only if it is currently playing
+    if (playing) {
+        // restart the source but not the recorder
         source.stop();
         createSource();
         source.connect(recorderDestination);
@@ -250,4 +254,3 @@ function parseURL() {
         document.getElementById("amplitudeSlider").value = position;
     }
 }
-
