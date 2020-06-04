@@ -3,41 +3,33 @@ class ToneGenerator {
         this.sampleRate = sampleRate;
     }
 
-    getSampleRate() {
-        return this.sampleRate;
-    }
-
     generateSine(frequency, amplitude, duration) {
-        const numSamples = Math.floor(duration * this.sampleRate);
-        const samples = new Float32Array(numSamples);
-        const timeStep = 1.0 / this.sampleRate;
         const omega = 2.0 * Math.PI * frequency;
-        let time = 0.0;
-
-        for (let i = 0; i < samples.length; i++) {
-            samples[i] = amplitude * Math.sin(omega * time);
-            time += timeStep;
-        }
-
-        return samples;
+        const func = time => Math.sin(omega * time);
+        return this.generateTone(frequency, amplitude, duration, func);
     }
 
-    // TODO: extract duplicated code
     generateSquare(frequency, amplitude, duration) {
-        const numSamples = Math.floor(duration * this.sampleRate);
-        const samples = new Float32Array(numSamples);
-        const timeStep = 1.0 / this.sampleRate;
         const period = 1.0 / frequency;
-        let time = 0.0;
-
-        for (let i = 0; i < samples.length; i++) {
+        return this.generateTone(frequency, amplitude, duration, (time) => {
             const phase = time % period;
             if (phase / period < 0.5) {
-                samples[i] = amplitude;
+                return 1.0;
             } else {
-                samples[i] = -amplitude;
+                return -1.0;
             }
-            time += timeStep;
+        });
+    }
+
+    generateTone(frequency, amplitude, duration, getSample) {
+        const numSamples = Math.floor(duration * this.sampleRate);
+        const samples = new Float32Array(numSamples);
+        const timeStep = 1.0 / this.sampleRate;
+        let time = 0.0;
+
+        for (let i = 0; i < samples.length; i++) {
+            samples[i] = amplitude * getSample(time);
+            time += timeStep; // TODO: maybe accumulates rounding errors?
         }
 
         return samples;
