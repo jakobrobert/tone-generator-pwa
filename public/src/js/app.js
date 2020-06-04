@@ -8,6 +8,8 @@ let recorder;
 let recorderDestination;
 let recordData = [];
 
+let generator;
+
 let frequency;
 let amplitude;
 
@@ -140,31 +142,31 @@ function createRecorder() {
 }
 
 function generateTone() {
-    const func = createFunction();
-    if (!func) {
-        // invalid function, cannot generate tone
-        return;
-    }
-
     const duration = getDuration();
     if (!duration) {
         // invalid duration, cannot generate tone
         return;
     }
 
+    // TODO: Enable again later -> extract into ToneGenerator class
+    /*
+    const func = createFunction();
+    if (!func) {
+        // invalid function, cannot generate tone
+        return;
+    }
+    */
+
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
+        generator = new ToneGenerator(ctx.sampleRate);
     }
 
-    const numSamples = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < buffer.length; i++) {
-        const time = i / ctx.sampleRate;
-        data[i] = amplitude * func(frequency, time);
-    }
+    // TODO: check selected waveform
+    const samples = generator.generateSine();
+    const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+    buffer.copyToChannel(samples, 0);
 
     return buffer;
 }
