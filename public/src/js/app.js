@@ -163,8 +163,17 @@ function generateTone() {
         generator = new ToneGenerator(ctx.sampleRate);
     }
 
-    // TODO: check selected waveform
-    const samples = generator.generateSine();
+    // TODO: extract into ToneGenerator
+    let samples;
+    const waveform = document.getElementById("waveform").value;
+    if (waveform === "sine") {
+        samples = generator.generateSine(frequency, amplitude, duration);
+    } else if (waveform === "square") {
+        samples = generator.generateSquare(frequency, amplitude, duration);
+    } else {
+        throw new Error("Invalid waveform!");
+    }
+
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
     buffer.copyToChannel(samples, 0);
 
