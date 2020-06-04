@@ -5,20 +5,35 @@ class ToneGenerator {
 
     generateSine(frequency, amplitude, duration) {
         const omega = 2.0 * Math.PI * frequency;
-        const func = time => Math.sin(omega * time);
-        return this.generateTone(frequency, amplitude, duration, func);
+        return this.generateTone(frequency, amplitude, duration, (time) => {
+            return Math.sin(omega * time);
+        });
     }
 
     generateSquare(frequency, amplitude, duration) {
         const period = 1.0 / frequency;
         return this.generateTone(frequency, amplitude, duration, (time) => {
             const phase = time % period;
-            if (phase / period < 0.5) {
+            if (phase < 0.5 * period) {
                 return 1.0;
-            } else {
-                return -1.0;
             }
+            return -1.0;
         });
+    }
+
+    generateTriangle(frequency, amplitude, duration) {
+        const period = 1.0 / frequency;
+        const slope = 4.0 / period;
+        return this.generateTone(frequency, amplitude, duration, (time) => {
+            const phase = time % period;
+            if (phase < 0.25 * period) {
+                return slope * phase;
+            }
+            if (phase < 0.75 * period) {
+                return 2.0 - slope * phase;
+            }
+            return slope * phase - 4.0;
+        })
     }
 
     generateTone(frequency, amplitude, duration, getSample) {
