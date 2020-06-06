@@ -48,6 +48,21 @@ class ToneGenerator {
         });
     }
 
+    generateCustom(frequency, amplitude, duration, expression) {
+        let expr = expression.replace(/sin/gi, "Math.sin");
+        expr = expr.replace(/pi/gi, "Math.PI")
+        expr = "return " + expr + ";";
+        try {
+            const func = new Function("f", "t", expr);
+            return this.generateTone(frequency, amplitude, duration, (time) => {
+                return func(frequency, time);
+            });
+        } catch (err) {
+            console.error("Error in \"function\": ", err);
+            alert("Error in \"function\": " + err.message);
+        }
+    }
+
     generateTone(frequency, amplitude, duration, getSample) {
         const numSamples = Math.floor(duration * this.sampleRate);
         const samples = new Float32Array(numSamples);

@@ -16,15 +16,16 @@
     <h2>Tone Generator</h2>
     <div>
         <label for="waveform">Waveform:</label>
-        <select id="waveform">
+        <select id="waveform" onchange="onWaveformChanged()">
             <option value="sine">Sine</option>
             <option value="square">Square</option>
             <option value="triangle">Triangle</option>
             <option value="sawtooth">Sawtooth</option>
+            <option value="custom">Custom</option>
         </select>
     </div>
     <!-- TODO enable again later -->
-    <div hidden>
+    <div id="functionDiv" hidden>
         <label for="function">Function:</label>
         <input type="text" id="function" value="sin(2*pi*f*t)" size="30">
     </div>

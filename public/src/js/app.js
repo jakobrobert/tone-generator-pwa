@@ -10,6 +10,7 @@ let recordData = [];
 
 let generator;
 
+let waveform;
 let frequency;
 let amplitude;
 
@@ -40,9 +41,16 @@ const logFrequencySlider = new LogSlider(100, 20, 20000);
 
 parseURL();
 
-// update for initial slider values
+// update for initial values -> TODO: bundle into init() method instead?
+onWaveformChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
+
+function onWaveformChanged() {
+    waveform = document.getElementById("waveform").value;
+    // only show function input for custom waveform
+    document.getElementById("functionDiv").hidden = (waveform !== "custom");
+}
 
 function onFrequencyChanged() {
     const slider = document.getElementById("frequencySlider");
@@ -148,15 +156,6 @@ function generateTone() {
         return;
     }
 
-    // TODO: Enable again later -> extract into ToneGenerator class
-    /*
-    const func = createFunction();
-    if (!func) {
-        // invalid function, cannot generate tone
-        return;
-    }
-    */
-
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
@@ -174,26 +173,20 @@ function generateTone() {
         samples = generator.generateTriangle(frequency, amplitude, duration);
     } else if (waveform === "sawtooth") {
         samples = generator.generateSawtooth(frequency, amplitude, duration);
+    } else if (waveform === "custom") {
+        const expression = document.getElementById("function").value;
+        samples = generator.generateCustom(frequency, amplitude, duration, expression);
     } else {
         throw new Error("Invalid waveform!");
+    }
+
+    if (!samples) {
+        return;
     }
 
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
     buffer.copyToChannel(samples, 0);
     return buffer;
-}
-
-function createFunction() {
-    let expr = document.getElementById("function").value;
-    expr = expr.replace(/sin/gi, "Math.sin")
-    expr = expr.replace(/pi/gi, "Math.PI");
-    expr = "return " + expr + ";";
-    try {
-        return new Function("f", "t", expr);
-    } catch (err) {
-        console.error("Error in \"function\": ", err);
-        alert("Error in \"function\": " + err.message);
-    }
 }
 
 function getDuration() {
@@ -222,14 +215,16 @@ function copyLink() {
 }
 
 function buildURL() {
-    const params = {
-        // func: document.getElementById("function").value, TODO: enable again later
-        waveform: document.getElementById("waveform").value,
-        duration: document.getElementById("duration").value,
-        loop: document.getElementById("loop").checked,
-        frequency: frequency,
-        amplitude: amplitude
-    };
+    const params = {};
+    params.waveform = waveform;
+    // expression only relevant for custom wave
+    if (waveform === "custom") {
+        params.func = document.getElementById("function").value;
+    }
+    params.duration = document.getElementById("duration").value;
+    params.loop = document.getElementById("loop").checked;
+    params.frequency = frequency;
+    params.amplitude = amplitude;
 
     const queryParams = [];
     for (const key in params) {
@@ -245,18 +240,18 @@ function parseURL() {
     const url = new URL(document.location);
     const params = url.searchParams;
 
-    // const func = params.get("func"); TODO: enable again later
-    const waveform = params.get("waveform");
+    const waveformValue = params.get("waveform");
+    const func = params.get("func");
     const duration = params.get("duration");
     const loop = params.get("loop");
     const frequencyValue = params.get("frequency");
     const amplitudeValue = params.get("amplitude");
 
-    /*if (func) {
+    if (waveformValue) {
+        document.getElementById("waveform").value = waveformValue;
+    }
+    if (func) {
         document.getElementById("function").value = func;
-    }*/
-    if (waveform) {
-        document.getElementById("waveform").value = waveform;
     }
     if (duration) {
         document.getElementById("duration").value = duration;
