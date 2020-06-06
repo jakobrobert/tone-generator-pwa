@@ -175,7 +175,7 @@ function generateTone() {
     } else if (waveform === "sawtooth") {
         samples = generator.generateSawtooth(frequency, amplitude, duration);
     } else if (waveform === "custom") {
-        const expression = document.getElementById("function").value;
+        const expression = document.getElementById("expression").value;
         samples = generator.generateCustom(frequency, amplitude, duration, expression);
     } else {
         throw new Error("Invalid waveform!");
@@ -241,15 +241,15 @@ function parseURL() {
     const url = new URL(document.location);
     const params = url.searchParams;
 
-    const waveformValue = params.get("waveform");
+    const waveform = params.get("waveform");
     const expression = params.get("expression");
     const duration = params.get("duration");
     const loop = params.get("loop");
-    const frequencyValue = params.get("frequency");
-    const amplitudeValue = params.get("amplitude");
+    const frequency = params.get("frequency");
+    const amplitude = params.get("amplitude");
 
-    if (waveformValue) {
-        document.getElementById("waveform").value = waveformValue;
+    if (waveform) {
+        document.getElementById("waveform").value = waveform;
     }
     if (expression) {
         document.getElementById("expression").value = expression;
@@ -260,12 +260,12 @@ function parseURL() {
     if (loop) {
         document.getElementById("loop").checked = (loop === "true");
     }
-    if (frequencyValue) {
-        const position = logFrequencySlider.getPositionFromValue(frequencyValue).toFixed(0);
+    if (frequency) {
+        const position = logFrequencySlider.getPositionFromValue(frequency).toFixed(0);
         document.getElementById("frequencySlider").value = position;
     }
-    if (amplitudeValue) {
-        const position = (amplitudeValue * 100).toFixed(0);
+    if (amplitude) {
+        const position = (amplitude * 100).toFixed(0);
         document.getElementById("amplitudeSlider").value = position;
     }
 }
