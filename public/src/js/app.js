@@ -50,6 +50,7 @@ function onWaveformChanged() {
     waveform = document.getElementById("waveform").value;
     // only show function input for custom waveform
     document.getElementById("functionDiv").hidden = (waveform !== "custom");
+    update();
 }
 
 function onFrequencyChanged() {
