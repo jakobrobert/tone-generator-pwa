@@ -223,7 +223,8 @@ function copyLink() {
 
 function buildURL() {
     const params = {
-        func: document.getElementById("function").value,
+        // func: document.getElementById("function").value, TODO: enable again later
+        waveform: document.getElementById("waveform").value,
         duration: document.getElementById("duration").value,
         loop: document.getElementById("loop").checked,
         frequency: frequency,
@@ -244,14 +245,18 @@ function parseURL() {
     const url = new URL(document.location);
     const params = url.searchParams;
 
-    const func = params.get("func");
+    // const func = params.get("func"); TODO: enable again later
+    const waveform = params.get("waveform");
     const duration = params.get("duration");
     const loop = params.get("loop");
     const frequencyValue = params.get("frequency");
     const amplitudeValue = params.get("amplitude");
 
-    if (func) {
+    /*if (func) {
         document.getElementById("function").value = func;
+    }*/
+    if (waveform) {
+        document.getElementById("waveform").value = waveform;
     }
     if (duration) {
         document.getElementById("duration").value = duration;
