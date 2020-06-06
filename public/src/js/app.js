@@ -172,6 +172,8 @@ function generateTone() {
         samples = generator.generateSquare(frequency, amplitude, duration);
     } else if (waveform === "triangle") {
         samples = generator.generateTriangle(frequency, amplitude, duration);
+    } else if (waveform === "sawtooth") {
+        samples = generator.generateSawtooth(frequency, amplitude, duration);
     } else {
         throw new Error("Invalid waveform!");
     }

@@ -36,6 +36,18 @@ class ToneGenerator {
         })
     }
 
+    generateSawtooth(frequency, amplitude, duration) {
+        const period = 1.0 / frequency;
+        const slope = 2.0 / period;
+        return this.generateTone(frequency, amplitude, duration, (time) => {
+            const phase = time % period;
+            if (phase < 0.5 * period) {
+                return slope * phase;
+            }
+            return slope * phase - 2.0;
+        });
+    }
+
     generateTone(frequency, amplitude, duration, getSample) {
         const numSamples = Math.floor(duration * this.sampleRate);
         const samples = new Float32Array(numSamples);
@@ -44,7 +56,8 @@ class ToneGenerator {
 
         for (let i = 0; i < samples.length; i++) {
             samples[i] = amplitude * getSample(time);
-            time += timeStep; // TODO: maybe accumulates rounding errors?
+            // TODO: maybe accumulates rounding errors? -> No, distortions occur when multiplying for time as well
+            time += timeStep;
         }
 
         return samples;
