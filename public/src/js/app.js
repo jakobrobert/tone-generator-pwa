@@ -49,7 +49,7 @@ onAmplitudeChanged();
 function onWaveformChanged() {
     waveform = document.getElementById("waveform").value;
     // only show function input for custom waveform
-    document.getElementById("functionDiv").hidden = (waveform !== "custom");
+    document.getElementById("expressionDiv").hidden = (waveform !== "custom");
     update();
 }
 
@@ -220,7 +220,7 @@ function buildURL() {
     params.waveform = waveform;
     // expression only relevant for custom wave
     if (waveform === "custom") {
-        params.func = document.getElementById("function").value;
+        params.expression = document.getElementById("expression").value;
     }
     params.duration = document.getElementById("duration").value;
     params.loop = document.getElementById("loop").checked;
@@ -242,7 +242,7 @@ function parseURL() {
     const params = url.searchParams;
 
     const waveformValue = params.get("waveform");
-    const func = params.get("func");
+    const expression = params.get("expression");
     const duration = params.get("duration");
     const loop = params.get("loop");
     const frequencyValue = params.get("frequency");
@@ -251,8 +251,8 @@ function parseURL() {
     if (waveformValue) {
         document.getElementById("waveform").value = waveformValue;
     }
-    if (func) {
-        document.getElementById("function").value = func;
+    if (expression) {
+        document.getElementById("expression").value = expression;
     }
     if (duration) {
         document.getElementById("duration").value = duration;
