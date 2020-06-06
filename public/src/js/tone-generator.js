@@ -66,13 +66,10 @@ class ToneGenerator {
     generateTone(frequency, amplitude, duration, getSample) {
         const numSamples = Math.floor(duration * this.sampleRate);
         const samples = new Float32Array(numSamples);
-        const timeStep = 1.0 / this.sampleRate;
-        let time = 0.0;
 
         for (let i = 0; i < samples.length; i++) {
+            const time = i / this.sampleRate;
             samples[i] = amplitude * getSample(time);
-            // TODO: maybe accumulates rounding errors? -> No, distortions occur when multiplying for time as well
-            time += timeStep;
         }
 
         return samples;
