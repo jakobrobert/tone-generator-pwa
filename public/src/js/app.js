@@ -41,7 +41,7 @@ const logFrequencySlider = new LogSlider(100, 20, 20000);
 
 parseURL();
 
-// update for initial values -> TODO: bundle into init() method instead?
+// update for initial values
 onWaveformChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
@@ -163,23 +163,15 @@ function generateTone() {
         generator = new ToneGenerator(ctx.sampleRate);
     }
 
-    // TODO: extract into factory method (maybe in ToneGenerator?)
-    let samples;
-    const waveform = document.getElementById("waveform").value;
-    if (waveform === "sine") {
-        samples = generator.generateSine(frequency, amplitude, duration);
-    } else if (waveform === "square") {
-        samples = generator.generateSquare(frequency, amplitude, duration);
-    } else if (waveform === "triangle") {
-        samples = generator.generateTriangle(frequency, amplitude, duration);
-    } else if (waveform === "sawtooth") {
-        samples = generator.generateSawtooth(frequency, amplitude, duration);
-    } else if (waveform === "custom") {
-        const expression = document.getElementById("expression").value;
-        samples = generator.generateCustom(frequency, amplitude, duration, expression);
-    } else {
-        throw new Error("Invalid waveform!");
+    const options = {};
+    options.waveform = waveform;
+    options.frequency = frequency;
+    options.amplitude = amplitude;
+    options.duration = duration;
+    if (waveform === "custom") {
+        options.expression = document.getElementById("expression").value;
     }
+    const samples = generator.generateTone(options);
 
     if (!samples) {
         return;

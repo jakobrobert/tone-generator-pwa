@@ -3,16 +3,32 @@ class ToneGenerator {
         this.sampleRate = sampleRate;
     }
 
+    generateTone(options) {
+        if (waveform === "sine") {
+            return generator.generateSine(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "square") {
+            return generator.generateSquare(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "triangle") {
+            return generator.generateTriangle(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "sawtooth") {
+            return generator.generateSawtooth(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "custom") {
+            return generator.generateCustom(options.frequency, options.amplitude, options.duration, options.expression);
+        } else {
+            throw new Error("Invalid waveform!");
+        }
+    }
+
     generateSine(frequency, amplitude, duration) {
         const omega = 2.0 * Math.PI * frequency;
-        return this.generateTone(frequency, amplitude, duration, (time) => {
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
             return Math.sin(omega * time);
         });
     }
 
     generateSquare(frequency, amplitude, duration) {
         const period = 1.0 / frequency;
-        return this.generateTone(frequency, amplitude, duration, (time) => {
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
             const phase = time % period;
             if (phase < 0.5 * period) {
                 return 1.0;
@@ -24,7 +40,7 @@ class ToneGenerator {
     generateTriangle(frequency, amplitude, duration) {
         const period = 1.0 / frequency;
         const slope = 4.0 / period;
-        return this.generateTone(frequency, amplitude, duration, (time) => {
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
             const phase = time % period;
             if (phase < 0.25 * period) {
                 return slope * phase;
@@ -39,7 +55,7 @@ class ToneGenerator {
     generateSawtooth(frequency, amplitude, duration) {
         const period = 1.0 / frequency;
         const slope = 2.0 / period;
-        return this.generateTone(frequency, amplitude, duration, (time) => {
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
             const phase = time % period;
             if (phase < 0.5 * period) {
                 return slope * phase;
@@ -54,7 +70,7 @@ class ToneGenerator {
         expr = "return " + expr + ";";
         try {
             const func = new Function("f", "t", expr);
-            return this.generateTone(frequency, amplitude, duration, (time) => {
+            return this.generateToneHelper(frequency, amplitude, duration, (time) => {
                 return func(frequency, time);
             });
         } catch (err) {
@@ -63,7 +79,7 @@ class ToneGenerator {
         }
     }
 
-    generateTone(frequency, amplitude, duration, getSample) {
+    generateToneHelper(frequency, amplitude, duration, getSample) {
         const numSamples = Math.floor(duration * this.sampleRate);
         const samples = new Float32Array(numSamples);
 
