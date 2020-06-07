@@ -8,6 +8,9 @@ let recorder;
 let recorderDestination;
 let recordData = [];
 
+let generator;
+
+let waveform;
 let frequency;
 let amplitude;
 
@@ -38,9 +41,17 @@ const logFrequencySlider = new LogSlider(100, 20, 20000);
 
 parseURL();
 
-// update for initial slider values
+// update for initial values
+onWaveformChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
+
+function onWaveformChanged() {
+    waveform = document.getElementById("waveform").value;
+    // only show function input for custom waveform
+    document.getElementById("expressionDiv").hidden = (waveform !== "custom");
+    update();
+}
 
 function onFrequencyChanged() {
     const slider = document.getElementById("frequencySlider");
@@ -140,12 +151,6 @@ function createRecorder() {
 }
 
 function generateTone() {
-    const func = createFunction();
-    if (!func) {
-        // invalid function, cannot generate tone
-        return;
-    }
-
     const duration = getDuration();
     if (!duration) {
         // invalid duration, cannot generate tone
@@ -155,31 +160,26 @@ function generateTone() {
     // only create audio context once
     if (!ctx) {
         ctx = new AudioContext();
+        generator = new ToneGenerator(ctx.sampleRate);
     }
 
-    const numSamples = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, numSamples, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
+    const options = {};
+    options.waveform = waveform;
+    options.frequency = frequency;
+    options.amplitude = amplitude;
+    options.duration = duration;
+    if (waveform === "custom") {
+        options.expression = document.getElementById("expression").value;
+    }
+    const samples = generator.generateTone(options);
 
-    for (let i = 0; i < buffer.length; i++) {
-        const time = i / ctx.sampleRate;
-        data[i] = amplitude * func(frequency, time);
+    if (!samples) {
+        return;
     }
 
+    const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+    buffer.copyToChannel(samples, 0);
     return buffer;
-}
-
-function createFunction() {
-    let expr = document.getElementById("function").value;
-    expr = expr.replace(/sin/gi, "Math.sin")
-    expr = expr.replace(/pi/gi, "Math.PI");
-    expr = "return " + expr + ";";
-    try {
-        return new Function("f", "t", expr);
-    } catch (err) {
-        console.error("Error in \"function\": ", err);
-        alert("Error in \"function\": " + err.message);
-    }
 }
 
 function getDuration() {
@@ -208,13 +208,16 @@ function copyLink() {
 }
 
 function buildURL() {
-    const params = {
-        func: document.getElementById("function").value,
-        duration: document.getElementById("duration").value,
-        loop: document.getElementById("loop").checked,
-        frequency: frequency,
-        amplitude: amplitude
-    };
+    const params = {};
+    params.waveform = waveform;
+    // expression only relevant for custom wave
+    if (waveform === "custom") {
+        params.expression = document.getElementById("expression").value;
+    }
+    params.duration = document.getElementById("duration").value;
+    params.loop = document.getElementById("loop").checked;
+    params.frequency = frequency;
+    params.amplitude = amplitude;
 
     const queryParams = [];
     for (const key in params) {
@@ -230,14 +233,18 @@ function parseURL() {
     const url = new URL(document.location);
     const params = url.searchParams;
 
-    const func = params.get("func");
+    const waveform = params.get("waveform");
+    const expression = params.get("expression");
     const duration = params.get("duration");
     const loop = params.get("loop");
-    const frequencyValue = params.get("frequency");
-    const amplitudeValue = params.get("amplitude");
+    const frequency = params.get("frequency");
+    const amplitude = params.get("amplitude");
 
-    if (func) {
-        document.getElementById("function").value = func;
+    if (waveform) {
+        document.getElementById("waveform").value = waveform;
+    }
+    if (expression) {
+        document.getElementById("expression").value = expression;
     }
     if (duration) {
         document.getElementById("duration").value = duration;
@@ -245,12 +252,12 @@ function parseURL() {
     if (loop) {
         document.getElementById("loop").checked = (loop === "true");
     }
-    if (frequencyValue) {
-        const position = logFrequencySlider.getPositionFromValue(frequencyValue).toFixed(0);
+    if (frequency) {
+        const position = logFrequencySlider.getPositionFromValue(frequency).toFixed(0);
         document.getElementById("frequencySlider").value = position;
     }
-    if (amplitudeValue) {
-        const position = (amplitudeValue * 100).toFixed(0);
+    if (amplitude) {
+        const position = (amplitude * 100).toFixed(0);
         document.getElementById("amplitudeSlider").value = position;
     }
 }

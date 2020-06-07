@@ -9,13 +9,24 @@
     <!-- iOS support -->
     <link rel="apple-touch-icon" href="./src/img/icons/icon-192x192.png">
     <meta name="apple-mobile-web-app-status-bar" content="aqua">
+    <script src="./src/js/tone-generator.js"></script>
     <script src="./src/js/log-slider.js"></script>
 </head>
 <body>
     <h2>Tone Generator</h2>
     <div>
-        <label for="function">Function:</label>
-        <input type="text" id="function" value="sin(2*pi*f*t)" size="30">
+        <label for="waveform">Waveform:</label>
+        <select id="waveform" onchange="onWaveformChanged()">
+            <option value="sine">Sine</option>
+            <option value="square">Square</option>
+            <option value="triangle">Triangle</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="custom">Custom</option>
+        </select>
+    </div>
+    <div id="expressionDiv" hidden>
+        <label for="expression">Expression:</label>
+        <input type="text" id="expression" value="sin(2*pi*f*t)" size="30">
     </div>
     <div>
         <label for="duration">Duration:</label>
