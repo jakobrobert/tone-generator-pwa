@@ -9,6 +9,7 @@
     <!-- iOS support -->
     <link rel="apple-touch-icon" href="./src/img/icons/icon-192x192.png">
     <meta name="apple-mobile-web-app-status-bar" content="aqua">
+    <!-- JavaScript files -->
     <script src="./src/js/tone-generator.js"></script>
     <script src="./src/js/log-slider.js"></script>
 </head>
@@ -18,7 +19,7 @@
         <label for="waveform">Waveform:</label>
         <select id="waveform" onchange="onWaveformChanged()">
             <option value="sine">Sine</option>
-            <option value="square">Square</option>
+            <option value="pulse">Pulse</option>
             <option value="triangle">Triangle</option>
             <option value="sawtooth">Sawtooth</option>
             <option value="custom">Custom</option>
@@ -38,13 +39,18 @@
     </div>
     <div>
         <label for="frequencySlider">Frequency</label>
-        <input type="range" id="frequencySlider" max="100" value="50" oninput="onFrequencyChanged()">
+        <input type="range" id="frequencySlider" max="100" value="40" oninput="onFrequencyChanged()">
         <label id="frequencyLabel"></label>
     </div>
     <div>
         <label for="amplitudeSlider">Amplitude</label>
         <input type="range" id="amplitudeSlider" min="0" max="100" value="50" oninput="onAmplitudeChanged()">
         <label id="amplitudeLabel"></label>
+    </div>
+    <div id="dutyCycleDiv" hidden>
+        <label for="dutyCycleSlider">Duty Cycle</label>
+        <input type="range" id="dutyCycleSlider" min="0" max="100" value="50" oninput="onDutyCycleChanged()">
+        <label id="dutyCycleLabel"></label>
     </div>
     <br>
     <div>
@@ -57,7 +63,6 @@
         <input type="text" id="link">
         <button type="button" onclick="copyLink()">Copy</button>
     </div>
-
 
     <p>Recording starts automatically when you click <i>Start</i> and can be downloaded after you clicked <i>Stop</i>.<br>
     If you use Google Chrome, play it in the player below and click the three dots at the right to download it.<br>
