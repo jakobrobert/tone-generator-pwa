@@ -6,14 +6,12 @@ class ToneGenerator {
     generateTone(options) {
         if (waveform === "sine") {
             return this.generateSine(options.frequency, options.amplitude, options.duration);
-        } else if (waveform === "square") {
-            return this.generateSquare(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "pulse") {
+            return this.generatePulse(options.frequency, options.amplitude, options.duration, options.dutyCycle);
         } else if (waveform === "triangle") {
             return this.generateTriangle(options.frequency, options.amplitude, options.duration);
         } else if (waveform === "sawtooth") {
             return this.generateSawtooth(options.frequency, options.amplitude, options.duration);
-        } else if (waveform === "pulse") {
-            return this.generatePulse(options.frequency, options.amplitude, options.duration, options.dutyCycle);
         } else if (waveform === "custom") {
             return this.generateCustom(options.frequency, options.amplitude, options.duration, options.expression);
         } else {
@@ -28,8 +26,15 @@ class ToneGenerator {
         });
     }
 
-    generateSquare(frequency, amplitude, duration) {
-        return this.generatePulse(frequency, amplitude, duration, 0.5);
+    generatePulse(frequency, amplitude, duration, dutyCycle) {
+        const period = 1.0 / frequency;
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
+            const phase = time % period;
+            if (phase < dutyCycle * period) {
+                return 1.0;
+            }
+            return -1.0;
+        });
     }
 
     generateTriangle(frequency, amplitude, duration) {
@@ -56,17 +61,6 @@ class ToneGenerator {
                 return slope * phase;
             }
             return slope * phase - 2.0;
-        });
-    }
-
-    generatePulse(frequency, amplitude, duration, dutyCycle) {
-        const period = 1.0 / frequency;
-        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
-            const phase = time % period;
-            if (phase < dutyCycle * period) {
-                return 1.0;
-            }
-            return -1.0;
         });
     }
 
