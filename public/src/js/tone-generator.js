@@ -5,15 +5,17 @@ class ToneGenerator {
 
     generateTone(options) {
         if (waveform === "sine") {
-            return generator.generateSine(options.frequency, options.amplitude, options.duration);
+            return this.generateSine(options.frequency, options.amplitude, options.duration);
         } else if (waveform === "square") {
-            return generator.generateSquare(options.frequency, options.amplitude, options.duration);
+            return this.generateSquare(options.frequency, options.amplitude, options.duration);
         } else if (waveform === "triangle") {
-            return generator.generateTriangle(options.frequency, options.amplitude, options.duration);
+            return this.generateTriangle(options.frequency, options.amplitude, options.duration);
         } else if (waveform === "sawtooth") {
-            return generator.generateSawtooth(options.frequency, options.amplitude, options.duration);
+            return this.generateSawtooth(options.frequency, options.amplitude, options.duration);
+        } else if (waveform === "pulse") {
+            return this.generatePulse(options.frequency, options.amplitude, options.duration, options.dutyCycle);
         } else if (waveform === "custom") {
-            return generator.generateCustom(options.frequency, options.amplitude, options.duration, options.expression);
+            return this.generateCustom(options.frequency, options.amplitude, options.duration, options.expression);
         } else {
             throw new Error("Invalid waveform!");
         }
@@ -27,14 +29,7 @@ class ToneGenerator {
     }
 
     generateSquare(frequency, amplitude, duration) {
-        const period = 1.0 / frequency;
-        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
-            const phase = time % period;
-            if (phase < 0.5 * period) {
-                return 1.0;
-            }
-            return -1.0;
-        });
+        return this.generatePulse(frequency, amplitude, duration, 0.5);
     }
 
     generateTriangle(frequency, amplitude, duration) {
@@ -61,6 +56,17 @@ class ToneGenerator {
                 return slope * phase;
             }
             return slope * phase - 2.0;
+        });
+    }
+
+    generatePulse(frequency, amplitude, duration, dutyCycle) {
+        const period = 1.0 / frequency;
+        return this.generateToneHelper(frequency, amplitude, duration, (time) => {
+            const phase = time % period;
+            if (phase < dutyCycle * period) {
+                return 1.0;
+            }
+            return -1.0;
         });
     }
 
