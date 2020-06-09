@@ -21,6 +21,7 @@
             <option value="square">Square</option>
             <option value="triangle">Triangle</option>
             <option value="sawtooth">Sawtooth</option>
+            <option value="pulse">Pulse</option>
             <option value="custom">Custom</option>
         </select>
     </div>
@@ -45,6 +46,11 @@
         <label for="amplitudeSlider">Amplitude</label>
         <input type="range" id="amplitudeSlider" min="0" max="100" value="50" oninput="onAmplitudeChanged()">
         <label id="amplitudeLabel"></label>
+    </div>
+    <div id="dutyCycleDiv" hidden>
+        <label for="dutyCycleSlider">Duty Cycle</label>
+        <input type="range" id="dutyCycleSlider" min="0" max="100" value="50" oninput="onDutyCycleChanged()">
+        <label id="dutyCycleLabel"></label>
     </div>
     <br>
     <div>

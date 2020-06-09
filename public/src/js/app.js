@@ -13,6 +13,7 @@ let generator;
 let waveform;
 let frequency;
 let amplitude;
+let dutyCycle;
 
 let playing = false;
 
@@ -45,11 +46,14 @@ parseURL();
 onWaveformChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
+onDutyCycleChanged();
 
 function onWaveformChanged() {
     waveform = document.getElementById("waveform").value;
-    // only show function input for custom waveform
+    // only show expression input for custom waveform
     document.getElementById("expressionDiv").hidden = (waveform !== "custom");
+    // only show duty cycle input for pulse waveform
+    document.getElementById("dutyCycleDiv").hidden = (waveform !== "pulse");
     update();
 }
 
@@ -66,6 +70,14 @@ function onAmplitudeChanged() {
     amplitude = slider.value / 100.0;
     const label = document.getElementById("amplitudeLabel");
     label.innerText = "" + amplitude;
+    update();
+}
+
+function onDutyCycleChanged() {
+    const slider = document.getElementById("dutyCycleSlider");
+    dutyCycle = slider.value / 100.0;
+    const label = document.getElementById("dutyCycleLabel");
+    label.innerText = "" + dutyCycle;
     update();
 }
 
@@ -168,6 +180,9 @@ function generateTone() {
     options.frequency = frequency;
     options.amplitude = amplitude;
     options.duration = duration;
+    if (waveform === "pulse") {
+        options.dutyCycle = dutyCycle;
+    }
     if (waveform === "custom") {
         options.expression = document.getElementById("expression").value;
     }
