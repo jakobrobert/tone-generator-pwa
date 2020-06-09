@@ -233,6 +233,10 @@ function buildURL() {
     params.loop = document.getElementById("loop").checked;
     params.frequency = frequency;
     params.amplitude = amplitude;
+    if (waveform === "pulse") {
+        params.dutyCycle = dutyCycle;
+    }
+
 
     const queryParams = [];
     for (const key in params) {
@@ -254,6 +258,7 @@ function parseURL() {
     const loop = params.get("loop");
     const frequency = params.get("frequency");
     const amplitude = params.get("amplitude");
+    const dutyCycle = params.get("dutyCycle");
 
     if (waveform) {
         document.getElementById("waveform").value = waveform;
@@ -274,5 +279,9 @@ function parseURL() {
     if (amplitude) {
         const position = (amplitude * 100).toFixed(0);
         document.getElementById("amplitudeSlider").value = position;
+    }
+    if (dutyCycle) {
+        const position = (dutyCycle * 100).toFixed(0);
+        document.getElementById("dutyCycleSlider").value = position;
     }
 }

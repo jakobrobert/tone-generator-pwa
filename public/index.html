@@ -9,6 +9,7 @@
     <!-- iOS support -->
     <link rel="apple-touch-icon" href="./src/img/icons/icon-192x192.png">
     <meta name="apple-mobile-web-app-status-bar" content="aqua">
+    <!-- JavaScript files -->
     <script src="./src/js/tone-generator.js"></script>
     <script src="./src/js/log-slider.js"></script>
 </head>
@@ -39,7 +40,7 @@
     </div>
     <div>
         <label for="frequencySlider">Frequency</label>
-        <input type="range" id="frequencySlider" max="100" value="50" oninput="onFrequencyChanged()">
+        <input type="range" id="frequencySlider" max="100" value="40" oninput="onFrequencyChanged()">
         <label id="frequencyLabel"></label>
     </div>
     <div>
@@ -63,7 +64,6 @@
         <input type="text" id="link">
         <button type="button" onclick="copyLink()">Copy</button>
     </div>
-
 
     <p>Recording starts automatically when you click <i>Start</i> and can be downloaded after you clicked <i>Stop</i>.<br>
     If you use Google Chrome, play it in the player below and click the three dots at the right to download it.<br>
