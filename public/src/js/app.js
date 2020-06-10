@@ -163,7 +163,7 @@ function createSource() {
     }
     source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.loop = document.getElementById("loop").checked;
+    source.loop = loop;
     source.connect(ctx.destination); // connect for playback
     return true;
 }
@@ -207,7 +207,7 @@ function generateTone() {
         options.dutyCycle = dutyCycle;
     }
     if (waveform === "custom") {
-        options.expression = document.getElementById("expression").value;
+        options.expression = expression;
     }
     const samples = generator.generateTone(options);
 
@@ -221,8 +221,7 @@ function generateTone() {
 }
 
 function getDuration() {
-    let expr = document.getElementById("duration").value;
-    expr = "return " + expr + ";";
+    const expr = "return " + durationExpr + ";";
     try {
         const func = new Function("f", expr);
         return func(frequency);
@@ -252,10 +251,10 @@ function buildURL() {
     params.waveform = waveform;
     // expression only relevant for custom wave
     if (waveform === "custom") {
-        params.expression = document.getElementById("expression").value;
+        params.expression = expression;
     }
-    params.duration = document.getElementById("duration").value;
-    params.loop = document.getElementById("loop").checked;
+    params.duration = durationExpr;
+    params.loop = loop;
     params.frequency = frequency;
     params.amplitude = amplitude;
     if (waveform === "pulse") {
