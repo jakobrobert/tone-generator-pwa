@@ -11,6 +11,9 @@ let recordData = [];
 let generator;
 
 let waveform;
+let expression;
+let durationExpr;
+let loop;
 let frequency;
 let amplitude;
 let dutyCycle;
@@ -44,6 +47,9 @@ parseURL();
 
 // update for initial values
 onWaveformChanged();
+onExpressionChanged();
+onDurationChanged();
+onLoopChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
 onDutyCycleChanged();
@@ -54,6 +60,21 @@ function onWaveformChanged() {
     document.getElementById("expressionDiv").hidden = (waveform !== "custom");
     // only show duty cycle input for pulse waveform
     document.getElementById("dutyCycleDiv").hidden = (waveform !== "pulse");
+    update();
+}
+
+function onExpressionChanged() {
+    expression = document.getElementById("expression").value;
+    update();
+}
+
+function onDurationChanged() {
+    durationExpr = document.getElementById("duration").value;
+    update();
+}
+
+function onLoopChanged() {
+    loop = document.getElementById("loop").checked;
     update();
 }
 
@@ -121,6 +142,7 @@ function update() {
 }
 
 function handleUpdate() {
+    updateURL();
     // restart, but only if it is currently playing
     if (playing) {
         // restart the source but not the recorder
@@ -140,7 +162,7 @@ function createSource() {
     }
     source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.loop = document.getElementById("loop").checked;
+    source.loop = loop;
     source.connect(ctx.destination); // connect for playback
     return true;
 }
@@ -184,7 +206,7 @@ function generateTone() {
         options.dutyCycle = dutyCycle;
     }
     if (waveform === "custom") {
-        options.expression = document.getElementById("expression").value;
+        options.expression = expression;
     }
     const samples = generator.generateTone(options);
 
@@ -198,8 +220,7 @@ function generateTone() {
 }
 
 function getDuration() {
-    let expr = document.getElementById("duration").value;
-    expr = "return " + expr + ";";
+    const expr = "return " + durationExpr + ";";
     try {
         const func = new Function("f", expr);
         return func(frequency);
@@ -209,17 +230,9 @@ function getDuration() {
     }
 }
 
-function createLink() {
+function updateURL() {
     const url = buildURL();
-    const link = document.getElementById("link");
-    link.value = url;
-}
-
-function copyLink() {
-    const link = document.getElementById("link");
-    link.select();
-    document.execCommand("copy");
-    alert("Copied link: " + link.value);
+    window.history.replaceState(null, "", url);
 }
 
 function buildURL() {
@@ -227,22 +240,22 @@ function buildURL() {
     params.waveform = waveform;
     // expression only relevant for custom wave
     if (waveform === "custom") {
-        params.expression = document.getElementById("expression").value;
+        params.expression = expression;
     }
-    params.duration = document.getElementById("duration").value;
-    params.loop = document.getElementById("loop").checked;
+    params.duration = durationExpr;
+    params.loop = loop;
     params.frequency = frequency;
     params.amplitude = amplitude;
     if (waveform === "pulse") {
         params.dutyCycle = dutyCycle;
     }
 
-
     const queryParams = [];
     for (const key in params) {
         const queryParam = encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
         queryParams.push(queryParam);
     }
+
     const queryString = "?" + queryParams.join("&");
 
     return BASE_URL + queryString;

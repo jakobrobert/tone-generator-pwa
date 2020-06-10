@@ -27,15 +27,15 @@
     </div>
     <div id="expressionDiv" hidden>
         <label for="expression">Expression:</label>
-        <input type="text" id="expression" value="sin(2*pi*f*t)" size="30">
+        <input type="text" id="expression" size="30" value="sin(2*pi*f*t)" onchange="onExpressionChanged()">
     </div>
     <div>
         <label for="duration">Duration:</label>
-        <input type="text" id="duration" value="1">
+        <input type="text" id="duration" value="1" onchange="onDurationChanged()">
     </div>
     <div>
         <label for="loop">Loop</label>
-        <input type="checkbox" id="loop" checked>
+        <input type="checkbox" id="loop" checked onchange="onLoopChanged()">
     </div>
     <div>
         <label for="frequencySlider">Frequency</label>
@@ -56,12 +56,6 @@
     <div>
         <button type="button" onclick="start()">Start</button>
         <button type="button" onclick="stop()">Stop</button>
-    </div>
-    <br>
-    <div>
-        <button type="button" onclick="createLink()">Create Link</button>
-        <input type="text" id="link">
-        <button type="button" onclick="copyLink()">Copy</button>
     </div>
 
     <p>Recording starts automatically when you click <i>Start</i> and can be downloaded after you clicked <i>Stop</i>.<br>
