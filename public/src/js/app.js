@@ -213,6 +213,8 @@ function createLink() {
     const url = buildURL();
     const link = document.getElementById("link");
     link.value = url;
+
+    window.history.replaceState(null, "", url);
 }
 
 function copyLink() {
