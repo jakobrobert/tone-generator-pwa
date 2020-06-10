@@ -11,6 +11,9 @@ let recordData = [];
 let generator;
 
 let waveform;
+let expression;
+let durationExpr;
+let loop;
 let frequency;
 let amplitude;
 let dutyCycle;
@@ -44,6 +47,9 @@ parseURL();
 
 // update for initial values
 onWaveformChanged();
+onExpressionChanged();
+onDurationChanged();
+onLoopChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
 onDutyCycleChanged();
@@ -54,6 +60,21 @@ function onWaveformChanged() {
     document.getElementById("expressionDiv").hidden = (waveform !== "custom");
     // only show duty cycle input for pulse waveform
     document.getElementById("dutyCycleDiv").hidden = (waveform !== "pulse");
+    update();
+}
+
+function onExpressionChanged() {
+    expression = document.getElementById("expression").value;
+    update();
+}
+
+function onDurationChanged() {
+    durationExpr = document.getElementById("duration").value;
+    update();
+}
+
+function onLoopChanged() {
+    loop = document.getElementById("loop").checked;
     update();
 }
 
@@ -121,6 +142,8 @@ function update() {
 }
 
 function handleUpdate() {
+    // update url
+    createLink();
     // restart, but only if it is currently playing
     if (playing) {
         // restart the source but not the recorder
