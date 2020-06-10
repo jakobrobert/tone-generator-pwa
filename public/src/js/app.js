@@ -142,8 +142,7 @@ function update() {
 }
 
 function handleUpdate() {
-    // update url
-    createLink();
+    updateURL();
     // restart, but only if it is currently playing
     if (playing) {
         // restart the source but not the recorder
@@ -231,19 +230,9 @@ function getDuration() {
     }
 }
 
-function createLink() {
+function updateURL() {
     const url = buildURL();
-    const link = document.getElementById("link");
-    link.value = url;
-
     window.history.replaceState(null, "", url);
-}
-
-function copyLink() {
-    const link = document.getElementById("link");
-    link.select();
-    document.execCommand("copy");
-    alert("Copied link: " + link.value);
 }
 
 function buildURL() {
@@ -261,12 +250,12 @@ function buildURL() {
         params.dutyCycle = dutyCycle;
     }
 
-
     const queryParams = [];
     for (const key in params) {
         const queryParam = encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
         queryParams.push(queryParam);
     }
+
     const queryString = "?" + queryParams.join("&");
 
     return BASE_URL + queryString;
