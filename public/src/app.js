@@ -309,23 +309,34 @@ function createChart() {
     const ctx = document.getElementById("chart").getContext("2d");
     chart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: [0, 1, 2, 3, 4, 5], // need to manually add labels for some reason
-            datasets: [{
-                label: "Test",
-                lineTension: 0, // disable interpolation
-                data: [
-                    {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}, {x: 4, y: 2}, {x: 5, y: 1}, {x: 5, y: 0}
-                ]
-            }]
+        options: {
+            // use scale axis instead of category axis with labels
+            scales: {
+                xAxes: [{
+                    type: "linear",
+                    position: "bottom"
+                }]
+            }
         }
     });
 }
 
 function updateChart(samples, sampleRate) {
-    /*const data = [0, 1, 2, 3, 2, 1, 0];
+    const data = [];
+    // TODO: step size is only hack, need to fix
+    for (let i = 0; i < samples.length; i += 300) {
+        const point = {
+            x: i / sampleRate,
+            y: samples[i]
+        };
+        data.push(point);
+    }
+
     chart.data.datasets = [{
-        label: "Test",
+        label: "Samples",
+        lineTension: 0, // disable interpolation
         data: data
-    }];*/
+    }];
+
+    chart.update();
 }
