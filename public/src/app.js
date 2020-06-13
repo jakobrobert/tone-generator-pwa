@@ -310,11 +310,24 @@ function createChart() {
     chart = new Chart(ctx, {
         type: 'line',
         options: {
+            animation: {
+                duration: 0 // disable animation
+            },
             // use scale axis instead of category axis with labels
             scales: {
                 xAxes: [{
                     type: "linear",
-                    position: "bottom"
+                    position: "bottom",
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Time (s)"
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Amplitude"
+                    }
                 }]
             }
         }
@@ -323,8 +336,8 @@ function createChart() {
 
 function updateChart(samples, sampleRate) {
     const data = [];
-    // TODO: step size is only hack, need to fix
-    for (let i = 0; i < samples.length; i += 300) {
+    // TODO: too many points if showing one second
+    for (let i = 0; i < samples.length; i++) {
         const point = {
             x: i / sampleRate,
             y: samples[i]
@@ -335,6 +348,7 @@ function updateChart(samples, sampleRate) {
     chart.data.datasets = [{
         label: "Samples",
         lineTension: 0, // disable interpolation
+        pointRadius: 0, // disable circles for points
         data: data
     }];
 
