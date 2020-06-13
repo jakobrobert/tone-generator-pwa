@@ -8,8 +8,6 @@ let recorder;
 let recorderDestination;
 let recordData = [];
 
-let generator;
-
 let waveform;
 let expression;
 let durationExpr;
@@ -22,6 +20,10 @@ let playing = false;
 
 // initially true, so first event will trigger an update
 let mustUpdate = true;
+
+let generator;
+
+let chart;
 
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
@@ -42,6 +44,8 @@ if (!AudioContext) {
 }
 
 const logFrequencySlider = new LogSlider(100, 20, 20000);
+
+createChart();
 
 parseURL();
 
@@ -214,6 +218,8 @@ function generateTone() {
         return;
     }
 
+    updateChart(samples, ctx.sampleRate);
+
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
     buffer.copyToChannel(samples, 0);
     return buffer;
@@ -297,4 +303,29 @@ function parseURL() {
         const position = (dutyCycle * 100).toFixed(0);
         document.getElementById("dutyCycleSlider").value = position;
     }
+}
+
+function createChart() {
+    const ctx = document.getElementById("chart").getContext("2d");
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [0, 1, 2, 3, 4, 5], // need to manually add labels for some reason
+            datasets: [{
+                label: "Test",
+                lineTension: 0, // disable interpolation
+                data: [
+                    {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}, {x: 4, y: 2}, {x: 5, y: 1}, {x: 5, y: 0}
+                ]
+            }]
+        }
+    });
+}
+
+function updateChart(samples, sampleRate) {
+    /*const data = [0, 1, 2, 3, 2, 1, 0];
+    chart.data.datasets = [{
+        label: "Test",
+        data: data
+    }];*/
 }
