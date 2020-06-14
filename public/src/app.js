@@ -113,6 +113,8 @@ function onDutyCycleChanged() {
 
 function onChartTimeSpanChanged() {
     chartTimeSpan = document.getElementById("chartTimeSpan").value;
+    // different update logic here so tone is not re-generated
+    updateURL();
     updateChart();
 }
 
@@ -266,6 +268,7 @@ function buildURL() {
     if (waveform === "pulse") {
         params.dutyCycle = dutyCycle;
     }
+    params.chartTimeSpan = chartTimeSpan;
 
     const queryParams = [];
     for (const key in params) {
@@ -289,6 +292,7 @@ function parseURL() {
     const frequency = params.get("frequency");
     const amplitude = params.get("amplitude");
     const dutyCycle = params.get("dutyCycle");
+    const chartTimeSpan = params.get("chartTimeSpan");
 
     if (waveform) {
         document.getElementById("waveform").value = waveform;
@@ -313,6 +317,9 @@ function parseURL() {
     if (dutyCycle) {
         const position = (dutyCycle * 100).toFixed(0);
         document.getElementById("dutyCycleSlider").value = position;
+    }
+    if (chartTimeSpan) {
+        document.getElementById("chartTimeSpan").value = chartTimeSpan;
     }
 }
 
