@@ -316,6 +316,9 @@ function createChart() {
             animation: {
                 duration: 0 // disable animation
             },
+            legend: {
+                display: false // disable legend (database label)
+            },
             // use scale axis instead of category axis with labels
             scales: {
                 xAxes: [{
@@ -350,7 +353,6 @@ function updateChart(samples, sampleRate) {
     }
 
     chart.data.datasets = [{
-        label: "Samples",
         lineTension: 0, // disable interpolation
         pointRadius: 0, // disable circles for points
         data: data
