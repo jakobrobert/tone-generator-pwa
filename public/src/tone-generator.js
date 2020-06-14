@@ -80,7 +80,7 @@ class ToneGenerator {
     }
 
     generateToneHelper(frequency, amplitude, duration, getSample) {
-        const numSamples = Math.floor(duration * this.sampleRate);
+        const numSamples = Math.round(duration * this.sampleRate);
         const samples = new Float32Array(numSamples);
 
         for (let i = 0; i < samples.length; i++) {
