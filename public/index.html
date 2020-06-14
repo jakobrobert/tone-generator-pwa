@@ -58,6 +58,14 @@
         <button type="button" onclick="start()">Start</button>
         <button type="button" onclick="stop()">Stop</button>
     </div>
+    <br>
+    <div>
+        <label for="chartTimeSpan">Chart Time Span:</label>
+        <select id="chartTimeSpan" onchange="onChartTimeSpanChanged()">
+            <option value="full">Full Duration</option>
+            <option value="period">One Period</option>
+        </select>
+    </div>
 
     <canvas id="chartCanvas" width="400" height="400"></canvas>
 

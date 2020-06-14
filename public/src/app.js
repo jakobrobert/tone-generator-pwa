@@ -3,6 +3,7 @@ const UPDATE_TIMEOUT = 50;
 const BASE_URL = "https://jack0042.uber.space/tone-generator-pwa/"
 
 let ctx;
+let samples;
 let source;
 let recorder;
 let recorderDestination;
@@ -24,6 +25,7 @@ let mustUpdate = true;
 let generator;
 
 let chart;
+let chartTimeSpan;
 let maxNumPoints;   // max number of points in a chart
 
 // register service worker if it is supported
@@ -58,6 +60,8 @@ onLoopChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
 onDutyCycleChanged();
+
+onChartTimeSpanChanged();
 
 function onWaveformChanged() {
     waveform = document.getElementById("waveform").value;
@@ -105,6 +109,11 @@ function onDutyCycleChanged() {
     const label = document.getElementById("dutyCycleLabel");
     label.innerText = "" + dutyCycle;
     update();
+}
+
+function onChartTimeSpanChanged() {
+    chartTimeSpan = document.getElementById("chartTimeSpan").value;
+    updateChart();
 }
 
 function start() {
@@ -213,13 +222,14 @@ function generateTone() {
     if (waveform === "custom") {
         options.expression = expression;
     }
-    const samples = generator.generateTone(options);
 
-    if (!samples) {
+    const newSamples = generator.generateTone(options);
+    if (!newSamples) {
         return;
     }
+    samples = newSamples;
 
-    updateChart(samples, ctx.sampleRate);
+    updateChart();
 
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
     buffer.copyToChannel(samples, 0);
@@ -340,13 +350,26 @@ function createChart() {
     });
 }
 
-function updateChart(samples, sampleRate) {
-    const numSamplesPerPoint = Math.max(1, Math.round(samples.length / maxNumPoints));
+function updateChart() {
+    if (!samples || !chart) {
+        return;
+    }
+
+    let numSamples;
+    if (chartTimeSpan === "full") {
+        numSamples = samples.length;
+    } else if (chartTimeSpan === "period") {
+        const period = 1.0 / frequency;
+        numSamples = Math.round(period * ctx.sampleRate);
+    } else {
+        throw new Error("Invalid value for chartTimeSpan!");
+    }
+    const numSamplesPerPoint = Math.max(1, Math.round(numSamples / maxNumPoints));
     const data = [];
 
-    for (let i = 0; i < samples.length; i += numSamplesPerPoint) {
+    for (let i = 0; i < numSamples; i += numSamplesPerPoint) {
         const point = {
-            x: i / sampleRate,
+            x: i / ctx.sampleRate,
             y: samples[i]
         };
         data.push(point);
