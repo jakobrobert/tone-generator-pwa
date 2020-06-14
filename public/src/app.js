@@ -325,8 +325,9 @@ function parseURL() {
 
 function createChart() {
     const canvas = document.getElementById("chartCanvas");
-    maxNumPoints = canvas.clientWidth;
     const ctx = canvas.getContext("2d");
+    maxNumPoints = canvas.clientWidth;
+    const shouldResize = canvas.clientWidth + 50 > window.innerWidth;
     chart = new Chart(ctx, {
         type: 'line',
         options: {
@@ -336,6 +337,7 @@ function createChart() {
             legend: {
                 display: false // disable legend (database label)
             },
+            responsive: shouldResize,
             // use scale axis instead of category axis with labels
             scales: {
                 xAxes: [{
