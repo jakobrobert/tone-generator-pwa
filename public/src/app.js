@@ -24,6 +24,7 @@ let mustUpdate = true;
 let generator;
 
 let chart;
+let maxNumPoints;   // max number of points in a chart
 
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
@@ -306,7 +307,9 @@ function parseURL() {
 }
 
 function createChart() {
-    const ctx = document.getElementById("chart").getContext("2d");
+    const canvas = document.getElementById("chartCanvas");
+    maxNumPoints = canvas.clientWidth;
+    const ctx = canvas.getContext("2d");
     chart = new Chart(ctx, {
         type: 'line',
         options: {
@@ -335,9 +338,10 @@ function createChart() {
 }
 
 function updateChart(samples, sampleRate) {
+    const numSamplesPerPoint = Math.max(1, Math.round(samples.length / maxNumPoints));
     const data = [];
-    // TODO: too many points if showing one second
-    for (let i = 0; i < samples.length; i++) {
+
+    for (let i = 0; i < samples.length; i += numSamplesPerPoint) {
         const point = {
             x: i / sampleRate,
             y: samples[i]
