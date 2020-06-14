@@ -3,12 +3,11 @@ const UPDATE_TIMEOUT = 50;
 const BASE_URL = "https://jack0042.uber.space/tone-generator-pwa/"
 
 let ctx;
+let samples;
 let source;
 let recorder;
 let recorderDestination;
 let recordData = [];
-
-let generator;
 
 let waveform;
 let expression;
@@ -22,6 +21,12 @@ let playing = false;
 
 // initially true, so first event will trigger an update
 let mustUpdate = true;
+
+let generator;
+
+let chart;
+let chartTimeSpan;
+let maxNumPoints;   // max number of points in a chart
 
 // register service worker if it is supported
 if ('serviceWorker' in navigator) {
@@ -43,6 +48,8 @@ if (!AudioContext) {
 
 const logFrequencySlider = new LogSlider(100, 20, 20000);
 
+createChart();
+
 parseURL();
 
 // update for initial values
@@ -53,6 +60,8 @@ onLoopChanged();
 onFrequencyChanged();
 onAmplitudeChanged();
 onDutyCycleChanged();
+
+onChartTimeSpanChanged();
 
 function onWaveformChanged() {
     waveform = document.getElementById("waveform").value;
@@ -100,6 +109,13 @@ function onDutyCycleChanged() {
     const label = document.getElementById("dutyCycleLabel");
     label.innerText = "" + dutyCycle;
     update();
+}
+
+function onChartTimeSpanChanged() {
+    chartTimeSpan = document.getElementById("chartTimeSpan").value;
+    // different update logic here so tone is not re-generated
+    updateURL();
+    updateChart();
 }
 
 function start() {
@@ -208,11 +224,14 @@ function generateTone() {
     if (waveform === "custom") {
         options.expression = expression;
     }
-    const samples = generator.generateTone(options);
 
-    if (!samples) {
+    const newSamples = generator.generateTone(options);
+    if (!newSamples) {
         return;
     }
+    samples = newSamples;
+
+    updateChart();
 
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
     buffer.copyToChannel(samples, 0);
@@ -249,6 +268,7 @@ function buildURL() {
     if (waveform === "pulse") {
         params.dutyCycle = dutyCycle;
     }
+    params.chartTimeSpan = chartTimeSpan;
 
     const queryParams = [];
     for (const key in params) {
@@ -272,6 +292,7 @@ function parseURL() {
     const frequency = params.get("frequency");
     const amplitude = params.get("amplitude");
     const dutyCycle = params.get("dutyCycle");
+    const chartTimeSpan = params.get("chartTimeSpan");
 
     if (waveform) {
         document.getElementById("waveform").value = waveform;
@@ -297,4 +318,77 @@ function parseURL() {
         const position = (dutyCycle * 100).toFixed(0);
         document.getElementById("dutyCycleSlider").value = position;
     }
+    if (chartTimeSpan) {
+        document.getElementById("chartTimeSpan").value = chartTimeSpan;
+    }
+}
+
+function createChart() {
+    const canvas = document.getElementById("chartCanvas");
+    const ctx = canvas.getContext("2d");
+    maxNumPoints = canvas.clientWidth;
+    const shouldResize = canvas.clientWidth + 50 > window.innerWidth;
+    chart = new Chart(ctx, {
+        type: 'line',
+        options: {
+            animation: {
+                duration: 0 // disable animation
+            },
+            legend: {
+                display: false // disable legend (database label)
+            },
+            responsive: shouldResize,
+            // use scale axis instead of category axis with labels
+            scales: {
+                xAxes: [{
+                    type: "linear",
+                    position: "bottom",
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Time (s)"
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Amplitude"
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function updateChart() {
+    if (!samples || !chart) {
+        return;
+    }
+
+    let numSamples;
+    if (chartTimeSpan === "full") {
+        numSamples = samples.length;
+    } else if (chartTimeSpan === "period") {
+        const period = 1.0 / frequency;
+        numSamples = Math.round(period * ctx.sampleRate);
+    } else {
+        throw new Error("Invalid value for chartTimeSpan!");
+    }
+    const numSamplesPerPoint = Math.max(1, Math.round(numSamples / maxNumPoints));
+    const data = [];
+
+    for (let i = 0; i < numSamples; i += numSamplesPerPoint) {
+        const point = {
+            x: i / ctx.sampleRate,
+            y: samples[i]
+        };
+        data.push(point);
+    }
+
+    chart.data.datasets = [{
+        lineTension: 0, // disable interpolation
+        pointRadius: 0, // disable circles for points
+        data: data
+    }];
+
+    chart.update();
 }
